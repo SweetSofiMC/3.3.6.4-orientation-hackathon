@@ -28,6 +28,10 @@ def resume():
 def contact(): 
     return render_template('contact.html', title="Contact", url=os.getenv("URL"))
 
+@app.route('/health')
+def health():
+    return "Success",200
+
 @app.route('/send-email', methods=['GET','POST'])
 def send_email():
     response="Your message was sent succesfully!"
@@ -60,4 +64,5 @@ def send_email():
         response="Sorry, there was an error."
     
     return render_template('contact.html', title="Contact", response=response, url=os.getenv("URL"))
+
 
