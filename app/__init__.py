@@ -1,8 +1,10 @@
 import os
-from flask import Flask, render_template, send_from_directory, request
+import smtplib
+from flask import Flask, render_template, request
 from dotenv import load_dotenv
 from . import db
-import smtplib
+from app.db import get_db
+from werkzeug.security import generate_password_hash
 from email.mime.text import MIMEText
 
 load_dotenv()
@@ -41,9 +43,45 @@ def health():
     return "Success", 200
 
 
+@app.route('/register', methods=('GET', 'POST'))
+def register():
+    if request.method == 'POST':
+        user = request.form['username']
+        passwd = request.form['password']
+        db = get_db()
+
+        message = None
+        error = False
+
+        if not user:
+            message = 'You need to provide a username'
+            error = True
+        elif not passwd:
+            message = 'You need to provide a password'
+            error = True
+        elif db.execute(
+            'SELECT id FROM user WHERE username = ?', (user,)
+        ).fetchone() is not None:
+            message = "Username "+user+" is already taken"
+            error = True
+
+        if not error:
+            db.execute(
+                'INSERT INTO user (username, password) VALUES (?, ?)',
+                (user, generate_password_hash(passwd))
+            )
+            db.commit()
+            return "You've been successfully registered"
+        else:
+            return message, 400
+    return "Register page apparently", 501
+
+
+
+
 @app.route('/send-email', methods=['GET', 'POST'])
 def send_email():
-    response = "Your message was sent succesfully!"
+    response = "Your message was sent successfully!"
 
     try:
         # HTTP POST Request args
