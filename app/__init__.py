@@ -1,31 +1,34 @@
 import os
 from flask import Flask, render_template, send_from_directory, request
 from dotenv import load_dotenv
+from . import db
 import smtplib
 from email.mime.text import MIMEText
 
 load_dotenv()
 app = Flask(__name__)
+app.config['DATABASE'] = os.path.join(os.getcwd(), 'flask.sqlite')
+db.init_app(app)
 
 
 @app.route('/')
 def index():
     return render_template('index.html', title="MLH Fellow", url=os.getenv("URL"))
-    
+
 @app.route('/about')
 def about():
-    return render_template('about.html', title="MLH Fellow", url=os.getenv("URL"))   
+    return render_template('about.html', title="MLH Fellow", url=os.getenv("URL"))
 
 @app.route('/portfolio')
-def portfolio(): 
+def portfolio():
     return render_template('portfolio.html', title="Portfolio", url=os.getenv("URL"))
 
 @app.route('/resume')
-def resume(): 
+def resume():
     return render_template('resume.html', title="Resume", url=os.getenv("URL"))
 
 @app.route('/contact')
-def contact(): 
+def contact():
     return render_template('contact.html', title="Contact", url=os.getenv("URL"))
 
 @app.route('/health')
@@ -35,7 +38,7 @@ def health():
 @app.route('/send-email', methods=['GET','POST'])
 def send_email():
     response="Your message was sent succesfully!"
-    
+
     try:
         # HTTP POST Request args
         email_sender = request.form['email']
@@ -62,7 +65,7 @@ def send_email():
         server.quit()
     except:
         response="Sorry, there was an error."
-    
+
     return render_template('contact.html', title="Contact", response=response, url=os.getenv("URL"))
 
 
