@@ -15,29 +15,35 @@ db.init_app(app)
 def index():
     return render_template('index.html', title="MLH Fellow", url=os.getenv("URL"))
 
+
 @app.route('/about')
 def about():
     return render_template('about.html', title="MLH Fellow", url=os.getenv("URL"))
+
 
 @app.route('/portfolio')
 def portfolio():
     return render_template('portfolio.html', title="Portfolio", url=os.getenv("URL"))
 
+
 @app.route('/resume')
 def resume():
     return render_template('resume.html', title="Resume", url=os.getenv("URL"))
+
 
 @app.route('/contact')
 def contact():
     return render_template('contact.html', title="Contact", url=os.getenv("URL"))
 
+
 @app.route('/health')
 def health():
-    return "Success",200
+    return "Success", 200
 
-@app.route('/send-email', methods=['GET','POST'])
+
+@app.route('/send-email', methods=['GET', 'POST'])
 def send_email():
-    response="Your message was sent succesfully!"
+    response = "Your message was sent succesfully!"
 
     try:
         # HTTP POST Request args
@@ -54,7 +60,7 @@ def send_email():
         email_recipent = os.environ.get('MAIL_RECIPENT')
 
         # Email Data
-        msg = MIMEText("Name: "+name+"\nContact email: "+email_sender+"\nMessage: "+message_content)
+        msg = MIMEText("Name: " + name + "\nContact email: " + email_sender + "\nMessage: " + message_content)
         msg['Subject'] = subject
         msg['From'] = email_username
         msg['To'] = email_recipent
@@ -64,8 +70,6 @@ def send_email():
         server.sendmail(email_username, [email_recipent], msg.as_string())
         server.quit()
     except:
-        response="Sorry, there was an error."
+        response = "Sorry, there was an error."
 
     return render_template('contact.html', title="Contact", response=response, url=os.getenv("URL"))
-
-
