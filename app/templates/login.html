@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block page %}<body>{% endblock %}
+{% block content %}
+    <div class="login-page">
+        <div class="login-form">
+            <h1>Login</h1>
+            {% if response %}
+            <p class="login-response">{{ response }}</p>
+            {% endif %}
+            <form id="login" action="{{ url_for('login') }}" method="POST">
+                <label for="username">Username:</label><br>
+                <input type="text" id="username" name="username" required><br>
+                <label for="password">Password:</label><br>
+                <input type="password" id="password" name="password" required><br>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}

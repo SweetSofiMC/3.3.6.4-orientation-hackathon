@@ -69,10 +69,10 @@ def register():
                 (username, generate_password_hash(password))
             )
             db.commit()
-            return "You've been successfully registered"
+            return render_template('register.html', response="You've been successfully registered")
         else:
-            return error, 418
-    return "Register page apparently", 501
+            return render_template('register.html', response=error)
+    return render_template('register.html')
 
 
 @app.route('/login', methods=('GET', 'POST'))
@@ -92,10 +92,10 @@ def login():
             error = 'Incorrect password.'
 
         if error is None:
-            return 'Login Successful', 200
+            return render_template('login.html', response=f"Welcome {user['username']}"), 200
         else:
-            return error, 418
-    return "Login Page not implemented yet", 501
+            return render_template('login.html', response=error), 418
+    return render_template('login.html')
 
 
 @app.route('/send-email', methods=['GET', 'POST'])
