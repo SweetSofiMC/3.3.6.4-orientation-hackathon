@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from . import db
 from app.db import get_db
 from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 from email.mime.text import MIMEText
 
 load_dotenv()
@@ -45,38 +46,56 @@ def health():
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
+    print(request.method)
     if request.method == 'POST':
-        user = request.form['username']
-        passwd = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
         db = get_db()
 
-        message = None
-        error = False
+        error = None
 
-        if not user:
-            message = 'You need to provide a username'
-            error = True
-        elif not passwd:
-            message = 'You need to provide a password'
-            error = True
+        if username is None:
+            error = 'You need to provide a username'
+        elif password is None:
+            error = 'You need to provide a password'
         elif db.execute(
-            'SELECT id FROM user WHERE username = ?', (user,)
+            'SELECT id FROM user WHERE username = ?', (username,)
         ).fetchone() is not None:
-            message = "Username "+user+" is already taken"
-            error = True
+            error = "Username "+username+" is already taken"
 
-        if not error:
+        if error is None:
             db.execute(
                 'INSERT INTO user (username, password) VALUES (?, ?)',
-                (user, generate_password_hash(passwd))
+                (username, generate_password_hash(password))
             )
             db.commit()
             return "You've been successfully registered"
         else:
-            return message, 400
+            return error, 418
     return "Register page apparently", 501
 
 
+@app.route('/login', methods=('GET', 'POST'))
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        db = get_db()
+        error = None
+        user = db.execute(
+            'SELECT * FROM user WHERE username = ?' , (username,)
+        ).fetchone()
+
+        if user is None:
+            error = 'Incorrect username.'
+        elif not check_password_hash(user['password'], password):
+            error = 'Incorrect password.'
+
+        if error is None:
+            return 'Login Successful', 200
+        else:
+            return error, 418
+    return "Login Page not implemented yet", 501
 
 
 @app.route('/send-email', methods=['GET', 'POST'])
