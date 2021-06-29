@@ -15,7 +15,7 @@ body {
     width: auto;
     overflow-x: hidden;
     font-family: "Roboto", serif;
-    margin: 0px;
+    margin: 0;
 }
 
 .nav-bar {
@@ -84,8 +84,8 @@ body.contact header div div a.contact {
     display: block;
     width: 100%;
     text-align: right;
-    padding-top: 0px;
-    padding-right: 0px;
+    padding-top: 0;
+    padding-right: 0;
 }
 
 @media screen and (max-width: 800px) {
@@ -135,7 +135,7 @@ body.contact header div div a.contact {
 }
 
 .banner {
-    padding: 20px 0px 50px 0px;
+    padding: 20px 0 50px 0;
     height: 150px;
     background-color: #1d539f;
 }
@@ -347,6 +347,58 @@ textarea {
         display: block;
     }
     .contact-form textarea {
+        max-width: 100%;
+    }
+}
+
+/* For login page */
+
+.login-page {
+    padding: 0 10%;
+    display: flex;
+    align-items: center;
+}
+
+.login-form{
+    padding-top: 30px;
+    margin: auto;
+}
+
+.login-form input{
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.login-form input[type=submit] {
+    width: 100px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: medium;
+}
+
+.login-form input[type=submit]:hover {
+    background-color: #45a049;
+}
+
+.login-response {
+    background-color: #00f0ef;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+@media screen and (max-width: 650px) {
+    .login-page {
+        display: block;
+    }
+    .login-form input[type=text],input[type=password] {
         max-width: 100%;
     }
 }
