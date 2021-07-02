@@ -5,3 +5,8 @@ Jinja2==3.0.1
 MarkupSafe==2.0.1
 python-dotenv==0.17.1
 Werkzeug==2.0.1
+gunicorn==20.1.0
+importlib-metadata==4.5.0
+dataclasses==0.6
+typing-extensions==3.10.0.0
+zipp==3.4.1

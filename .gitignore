@@ -5,3 +5,4 @@ __pycache__
 python3-virtualenv
 .DS_Store
 flask.sqlite
+.idea
