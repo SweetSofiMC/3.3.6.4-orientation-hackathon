@@ -2,16 +2,39 @@ import os
 import smtplib
 from flask import Flask, render_template, request
 from dotenv import load_dotenv
-from . import db
-from app.db import get_db
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from email.mime.text import MIMEText
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 load_dotenv()
 app = Flask(__name__)
-app.config['DATABASE'] = os.path.join(os.getcwd(), 'flask.sqlite')
-db.init_app(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://{user}:{passwd}@{host}:{port}/{table}'.format(
+    user=os.getenv('POSTGRES_USER'),
+    passwd=os.getenv('POSTGRES_PASSWORD'),
+    host=os.getenv('POSTGRES_HOST'),
+    port=5432,
+    table=os.getenv('POSTGRES_DB'))
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+
+class UserModel(db.Model):
+    __tablename__ = 'users'
+
+    username = db.Column(db.String(), primary_key=True)
+    password = db.Column(db.String())
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def __repr__(self):
+        return f"<User {self.username}>"
 
 
 @app.route('/')
@@ -50,7 +73,6 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        db = get_db()
 
         error = None
 
@@ -58,17 +80,13 @@ def register():
             error = 'You need to provide a username'
         elif password is None:
             error = 'You need to provide a password'
-        elif db.execute(
-            'SELECT id FROM user WHERE username = ?', (username,)
-        ).fetchone() is not None:
-            error = "Username "+username+" is already taken"
+        elif UserModel.query.filter_by(username=username).first() is not None:
+            error = "Username " + username + " is already taken."
 
         if error is None:
-            db.execute(
-                'INSERT INTO user (username, password) VALUES (?, ?)',
-                (username, generate_password_hash(password))
-            )
-            db.commit()
+            new_user = UserModel(username, generate_password_hash(password))
+            db.session.add(new_user)
+            db.session.commit()
             return render_template('register.html', response="You've been successfully registered")
         else:
             return render_template('register.html', response=error)
@@ -80,19 +98,16 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        db = get_db()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?' , (username,)
-        ).fetchone()
+        user = UserModel.query.filter_by(username=username).first()
 
         if user is None:
             error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
+        elif not check_password_hash(user.password, password):
             error = 'Incorrect password.'
 
         if error is None:
-            return render_template('login.html', response=f"Welcome {user['username']}"), 200
+            return render_template('login.html', response=f"Welcome {user.username}"), 200
         else:
             return render_template('login.html', response=error), 418
     return render_template('login.html')
