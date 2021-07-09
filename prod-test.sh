@@ -1,3 +1,5 @@
+sleep 10
+
 URL=https://mlh.sweetsofimc.dev
 
 RED='\033[0;31m'
