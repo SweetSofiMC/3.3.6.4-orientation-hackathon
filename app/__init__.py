@@ -46,7 +46,7 @@ def index():
     return render_template(
         "index.html",
         title="MLH Fellow",
-        username=session["username"],
+        username=session.get("username"),
         url=os.getenv("URL"),
     )
 
@@ -56,7 +56,7 @@ def about():
     return render_template(
         "about.html",
         title="MLH Fellow",
-        username=session["username"],
+        username=session.get("username"),
         url=os.getenv("URL"),
     )
 
@@ -66,7 +66,7 @@ def portfolio():
     return render_template(
         "portfolio.html",
         title="Portfolio",
-        username=session["username"],
+        username=session.get("username"),
         url=os.getenv("URL"),
     )
 
@@ -76,7 +76,7 @@ def resume():
     return render_template(
         "resume.html",
         title="Resume",
-        username=session["username"],
+        username=session.get("username"),
         url=os.getenv("URL"),
     )
 
@@ -86,7 +86,7 @@ def contact():
     return render_template(
         "contact.html",
         title="Contact",
-        username=session["username"],
+        username=session.get("username"),
         url=os.getenv("URL"),
     )
 
@@ -119,15 +119,15 @@ def register():
             session["username"] = username
             return render_template(
                 "register.html",
-                username=session["username"],
+                username=session.get("username"),
                 response="You've been successfully " "registered",
             )
         else:
             return render_template("register.html", response=error)
-    if session["username"] is not None:
+    if session.get("username") is not None:
         return redirect(url_for("index"))
     else:
-        return render_template("register.html", username=session["username"])
+        return render_template("register.html", username=session.get("username"))
 
 
 @app.route("/login", methods=("GET", "POST"))
@@ -148,17 +148,17 @@ def login():
             return (
                 render_template(
                     "login.html",
-                    username=session["username"],
+                    username=session.get("username"),
                     response=f"Welcome {user.username}",
                 ),
                 200,
             )
         else:
             return render_template("login.html", response=error), 418
-    if session["username"] is not None:
+    if session.get("username") is not None:
         return redirect(url_for("index"))
     else:
-        return render_template("login.html", username=session["username"])
+        return render_template("login.html", username=session.get("username"))
 
 
 @app.route("/logout", methods=("GET", "POST"))
@@ -208,5 +208,9 @@ def send_email():
         response = "Sorry, there was an error."
 
     return render_template(
-        "contact.html", title="Contact", response=response, url=os.getenv("URL")
+        "contact.html",
+        title="Contact",
+        response=response,
+        username=session.get("username"),
+        url=os.getenv("URL"),
     )
