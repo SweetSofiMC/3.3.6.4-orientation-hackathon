@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     name: "Deploy to AWS EC2 Virtual Machine"
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Configure SSH
         run: |
@@ -21,11 +21,11 @@ jobs:
             HostName $SSH_IP
             User $SSH_USER
             IdentityFile ~/.ssh/deploy-key.pem
-            StrictHostKeyCheking no
+            StrictHostKeyChecking no
           END
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_IP: ${{ secrets.SSH_IP }}
-      - name: Print project root directory
-        run: ssh my-vm 'cd ${{ secrets.PROJECT_ROOT }} && pwd'
+      - name: Deploy to AWS
+        run: ssh my-vm 'cd ${{ secrets.PROJECT_ROOT }} && git fetch && git reset --hard origin/master && docker-compose up -d --build'
