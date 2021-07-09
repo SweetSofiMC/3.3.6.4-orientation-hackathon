@@ -35,5 +35,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Test production page
         run: bash prod-test.sh
-      - name: Discord notification
+      - name: Discord notification on success
+        if: ${{ success() }}
         run: "curl -H \"Content-Type: application/json\" -d '{ \"content\": null, \"embeds\": [ { \"title\": \"Deployment successful 🚀\", \"description\": \"All test passed\", \"color\": 7143256, \"author\": { \"name\": \"[personal-portfolio-template]\", \"url\": \"https://github.com/SweetSofiMC/personal-portfolio-template\", \"icon_url\": \"https://raw.githubusercontent.com/SweetSofiMC/personal-portfolio-template/master/app/static/img/favicon.ico\" } } ] }' \"${{ secrets.DISCORD_WEBHOOK }}\""
+      - name: Discord notification on failure
+        if: ${{ failure() }}
+        run: "curl -H \"Content-Type: application/json\" -d '{ \"content\": null, \"embeds\": [ { \"title\": \"Deployment failed ❌\", \"color\": 16073300, \"author\": { \"name\": \"[personal-portfolio-template]\", \"url\": \"https://github.com/SweetSofiMC/personal-portfolio-template\", \"icon_url\": \"https://raw.githubusercontent.com/SweetSofiMC/personal-portfolio-template/master/app/static/img/favicon.ico\" } } ] }' \"${{ secrets.DISCORD_WEBHOOK }}\""
