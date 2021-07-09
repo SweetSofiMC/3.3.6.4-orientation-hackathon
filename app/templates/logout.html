@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block page %}<body class="logout">{% endblock %}
+{% block content %}
+    <div class="login-page">
+        <div class="login-form">
+            <h1>Logout</h1>
+            <form id="logout" action="{{ url_for('logout') }}" method="POST">
+                <input type="submit" id="logout-btn" value="Logout">
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -34,7 +34,7 @@ body {
 }
 
 .nav-menu {
-    width: 500px;
+    width: 650px;
     display: flex;
     justify-content: space-between;
 }
@@ -55,7 +55,10 @@ body {
 body.about header div div a.about,
 body.portfolio header div div a.portfolio,
 body.resume header div div a.resume,
-body.contact header div div a.contact {
+body.contact header div div a.contact,
+body.login header div div a.login,
+body.register header div div a.register,
+body.logout header div div a.logout{
     color: black;
 }
 
@@ -419,4 +422,9 @@ textarea {
         width: 100vw;
         padding-top: 0;
     }
+}
+
+/* Logout page */
+#logout-btn{
+    background-color: palevioletred;
 }

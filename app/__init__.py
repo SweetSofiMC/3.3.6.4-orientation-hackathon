@@ -1,6 +1,6 @@
 import os
 import smtplib
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
@@ -10,6 +10,7 @@ from flask_migrate import Migrate
 
 load_dotenv()
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://{user}:{passwd}@{host}:{port}/{table}'.format(
     user=os.getenv('POSTGRES_USER'),
     passwd=os.getenv('POSTGRES_PASSWORD'),
@@ -39,27 +40,27 @@ class UserModel(db.Model):
 
 @app.route('/')
 def index():
-    return render_template('index.html', title="MLH Fellow", url=os.getenv("URL"))
+    return render_template('index.html', title="MLH Fellow", username=session['username'], url=os.getenv("URL"))
 
 
 @app.route('/about')
 def about():
-    return render_template('about.html', title="MLH Fellow", url=os.getenv("URL"))
+    return render_template('about.html', title="MLH Fellow", username=session['username'], url=os.getenv("URL"))
 
 
 @app.route('/portfolio')
 def portfolio():
-    return render_template('portfolio.html', title="Portfolio", url=os.getenv("URL"))
+    return render_template('portfolio.html', title="Portfolio", username=session['username'], url=os.getenv("URL"))
 
 
 @app.route('/resume')
 def resume():
-    return render_template('resume.html', title="Resume", url=os.getenv("URL"))
+    return render_template('resume.html', title="Resume", username=session['username'], url=os.getenv("URL"))
 
 
 @app.route('/contact')
 def contact():
-    return render_template('contact.html', title="Contact", url=os.getenv("URL"))
+    return render_template('contact.html', title="Contact", username=session['username'], url=os.getenv("URL"))
 
 
 @app.route('/health')
@@ -87,10 +88,15 @@ def register():
             new_user = UserModel(username, generate_password_hash(password))
             db.session.add(new_user)
             db.session.commit()
-            return render_template('register.html', response="You've been successfully registered")
+            session["username"] = username
+            return render_template('register.html', username=session['username'], response="You've been successfully "
+                                                                                           "registered")
         else:
             return render_template('register.html', response=error)
-    return render_template('register.html')
+    if session['username'] is not None:
+        return redirect(url_for('index'))
+    else:
+        return render_template('register.html', username=session['username'])
 
 
 @app.route('/login', methods=('GET', 'POST'))
@@ -107,10 +113,22 @@ def login():
             error = 'Incorrect password.'
 
         if error is None:
-            return render_template('login.html', response=f"Welcome {user.username}"), 200
+            session["username"] = username
+            return render_template('login.html', username=session['username'], response=f"Welcome {user.username}"), 200
         else:
             return render_template('login.html', response=error), 418
-    return render_template('login.html')
+    if session['username'] is not None:
+        return redirect(url_for('index'))
+    else:
+        return render_template('login.html', username=session['username'])
+
+
+@app.route('/logout', methods=('GET', 'POST'))
+def logout():
+    if request.method == 'POST':
+        session['username'] = None
+        return redirect(url_for('login'))
+    return render_template('logout.html', username=session['username'])
 
 
 @app.route('/send-email', methods=['GET', 'POST'])
